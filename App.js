@@ -8,7 +8,7 @@ import InputScore from './src/screens/InputScore';
 function HomeScreen({navigation}) {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Домашний экран</Text>
+      <Text>Домашний экран2</Text>
     </View>
   );
 }
