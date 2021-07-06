@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   btnScore_number: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'green',
+    backgroundColor: 'orange',
     marginRight: 15,
     marginLeft: 15,
     marginBottom: 10,
