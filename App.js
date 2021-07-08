@@ -1,14 +1,22 @@
 import * as React from 'react';
-import {Button, View, Text} from 'react-native';
+import {View, Text} from 'react-native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
 
-import InputScore from './src/screens/InputScore';
+import InputScore from './src/screens/InputScore.js';
+import GoogleSignButton from './src/components/GoogleSignButton.js';
 
 function HomeScreen({navigation}) {
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+      }}>
       <Text>Домашний экран2</Text>
+      <GoogleSignButton />
     </View>
   );
 }
