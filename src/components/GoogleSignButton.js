@@ -39,18 +39,7 @@ const GoogleSignButton = () => {
       const apiKey = (await GoogleSignin.getTokens()).accessToken;
       console.log('Successful login');
 
-      const gdrive = new GDrive();
-      gdrive.accessToken = apiKey;
       setAccessToken(apiKey);
-
-      const arrBooks = await gdrive.files.list();
-      const nArr = arrBooks.files.map(item => ({
-        name: item.name,
-        id: item.id,
-      }));
-      setArrayBooks(nArr);
-      console.log(arrayBooks);
-      console.log(accessToken);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -67,6 +56,20 @@ const GoogleSignButton = () => {
         console.log(error);
       }
     }
+  };
+
+  const getList = async () => {
+    const list = await fetch('https://www.googleapis.com/drive/v3/files', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => data);
+
+    console.log(list);
   };
 
   const getValuesForRange = async () => {
@@ -174,6 +177,9 @@ const GoogleSignButton = () => {
       <View>
         <Button title="получить ID" onPress={getSheetId} />
         <Text>{sheetId}</Text>
+      </View>
+      <View>
+        <Button title="получить list" onPress={getList} />
       </View>
     </SafeAreaView>
   );
