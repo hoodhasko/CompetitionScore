@@ -50,5 +50,7 @@ export const getFiles = accessToken => {
     .then(res => res.json())
     .then(data => data);
 
+  console.log(accessToken);
+
   return files;
 };
