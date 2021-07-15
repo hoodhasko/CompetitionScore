@@ -6,7 +6,6 @@ import {
   StyleSheet,
   StatusBar,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 
 import {getFiles} from '../api/api.js';
 import ListItem from '../components/ListItem';
@@ -14,10 +13,9 @@ import ButtonRefresh from '../components/ButtonRefresh';
 import Header from '../components/Header';
 import Loader from '../components/Loader';
 
-const ListFiles = () => {
+const ListFiles = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState();
-  const navigation = useNavigation();
 
   const getFilesFromGDrive = async () => {
     setIsLoading(true);
@@ -25,8 +23,6 @@ const ListFiles = () => {
     const listFiles = await getFiles();
 
     setFiles(listFiles.files);
-
-    console.log(listFiles);
 
     if (listFiles !== undefined) {
       setIsLoading(false);
@@ -37,6 +33,12 @@ const ListFiles = () => {
     getFilesFromGDrive();
   }, []);
 
+  const navigateToSheets = id => {
+    navigation.navigate('ListSheets', {
+      spreadSheetId: id,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.root}>
       <StatusBar hidden={true} />
@@ -44,11 +46,15 @@ const ListFiles = () => {
         <Loader />
       ) : (
         <View style={styles.listItems}>
-          <Header title="Номинации" />
+          <Header title="Категория" />
           <FlatList
             data={files}
             renderItem={item => (
-              <ListItem data={item} navigation={navigation} />
+              <ListItem
+                id={item.item.id}
+                title={item.item.name}
+                onPress={navigateToSheets}
+              />
             )}
             keyExtractor={item => item.id}
             refreshing={isLoading}
