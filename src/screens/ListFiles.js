@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View, FlatList, StyleSheet} from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  FlatList,
+  StyleSheet,
+  StatusBar,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {getFiles} from '../api/api.js';
@@ -33,6 +39,7 @@ const ListFiles = () => {
 
   return (
     <SafeAreaView style={styles.root}>
+      <StatusBar hidden={true} />
       {isLoading ? (
         <Loader />
       ) : (
