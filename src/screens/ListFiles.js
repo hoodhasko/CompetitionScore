@@ -1,0 +1,70 @@
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, View, FlatList, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+
+import {getFiles} from '../api/api.js';
+import ListItem from '../components/ListItem';
+import ButtonRefresh from '../components/ButtonRefresh';
+import Header from '../components/Header';
+import Loader from '../components/Loader';
+
+const ListFiles = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [files, setFiles] = useState();
+  const navigation = useNavigation();
+
+  const getFilesFromGDrive = async () => {
+    setIsLoading(true);
+
+    const listFiles = await getFiles();
+
+    setFiles(listFiles.files);
+
+    console.log(listFiles);
+
+    if (listFiles !== undefined) {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getFilesFromGDrive();
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.root}>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <View style={styles.listItems}>
+          <Header title="Номинации" />
+          <FlatList
+            data={files}
+            renderItem={item => (
+              <ListItem data={item} navigation={navigation} />
+            )}
+            keyExtractor={item => item.id}
+            refreshing={isLoading}
+            showsVerticalScrollIndicator={false}
+          />
+          <ButtonRefresh refreshFunction={getFilesFromGDrive} />
+        </View>
+      )}
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#E7EBF8',
+  },
+  listItems: {
+    paddingHorizontal: 10,
+    width: '100%',
+    height: '100%',
+  },
+});
+
+export default ListFiles;
