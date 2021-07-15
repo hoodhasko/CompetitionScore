@@ -1,38 +1,32 @@
 import React, {useState, useEffect} from 'react';
 import {SafeAreaView, View, FlatList, StyleSheet} from 'react-native';
 
-import {getSheetsFromSpreadSheet} from '../api/api';
+import {getAthletesFromSheet} from '../api/api';
 
 import Header from '../components/Header';
 import Loader from '../components/Loader';
 import ListItem from '../components/ListItem';
 import ButtonRefresh from '../components/ButtonRefresh';
 
-const ListSheets = ({navigation, route}) => {
+const ListAthletes = ({route}) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [sheets, setSheets] = useState();
-  const {spreadSheetId} = route.params;
+  const [athletes, setAthletes] = useState();
+  const {sheetId, sheetName} = route.params;
 
-  const getSheets = async () => {
+  const getAthletes = async () => {
     setIsLoading(true);
-    const nominations = await getSheetsFromSpreadSheet(spreadSheetId);
-    setSheets(nominations);
+    const athletes = await getAthletesFromSheet(sheetId, sheetName);
 
-    if (nominations !== undefined) {
+    setAthletes(athletes);
+
+    if (athletes !== undefined) {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    getSheets();
+    getAthletes();
   }, []);
-
-  const navigateToAthletes = (id, name) => {
-    navigation.navigate('ListAthletes', {
-      sheetId: id,
-      sheetName: name,
-    });
-  };
 
   return (
     <SafeAreaView style={styles.root}>
@@ -40,21 +34,21 @@ const ListSheets = ({navigation, route}) => {
         <Loader />
       ) : (
         <View style={styles.listItems}>
-          <Header title="Номинация" />
+          <Header title="Спортсмены" />
           <FlatList
-            data={sheets}
+            data={athletes}
             renderItem={item => (
               <ListItem
-                id={spreadSheetId}
-                title={item.item.properties.title}
-                onPress={navigateToAthletes}
+                id={item.item.id}
+                title={item.item.name}
+                onPress={() => console.log('click')}
               />
             )}
-            keyExtractor={item => item.properties.sheetId}
+            keyExtractor={item => item.id}
             refreshing={isLoading}
             showsVerticalScrollIndicator={false}
           />
-          <ButtonRefresh refreshFunction={getSheets} />
+          <ButtonRefresh refreshFunction={getAthletes} />
         </View>
       )}
     </SafeAreaView>
@@ -74,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListSheets;
+export default ListAthletes;

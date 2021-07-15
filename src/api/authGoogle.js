@@ -69,8 +69,6 @@ const getRefreshToken = async () => {
   setTokenDate();
 
   await AsyncStorage.setItem('access_token', accessToken);
-
-  // return accessToken;
 };
 
 export const checkToken = async () => {
@@ -82,7 +80,6 @@ export const checkToken = async () => {
   } else {
     const tokenDate = await AsyncStorage.getItem('token_date');
 
-    console.log(tokenDate);
     const timeRefresh = (Date.now() - tokenDate) / 1000;
 
     if (timeRefresh > 3590) {
