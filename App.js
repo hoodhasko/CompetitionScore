@@ -1,27 +1,12 @@
-import * as React from 'react';
-import {Button, View, Text} from 'react-native';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {NavigationContainer} from '@react-navigation/native';
+import React from 'react';
+import {hideNavigationBar} from 'react-native-navigation-bar-color';
 
-import InputScore from './src/screens/InputScore';
+import Navigation from './src/navigation';
 
-function HomeScreen({navigation}) {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Домашний экран</Text>
-    </View>
-  );
-}
+const App = () => {
+  hideNavigationBar();
 
-const Drawer = createDrawerNavigator();
+  return <Navigation />;
+};
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen name="HomeScreen" component={HomeScreen} />
-        <Drawer.Screen name="inputScore" component={InputScore} />
-      </Drawer.Navigator>
-    </NavigationContainer>
-  );
-}
+export default App;
