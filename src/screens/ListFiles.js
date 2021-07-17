@@ -33,7 +33,7 @@ const ListFiles = ({navigation}) => {
     getFilesFromGDrive();
   }, []);
 
-  const navigateToSheets = id => {
+  const navigateToSheets = ({id}) => {
     navigation.navigate('ListSheets', {
       spreadSheetId: id,
     });

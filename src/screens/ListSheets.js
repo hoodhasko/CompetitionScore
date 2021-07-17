@@ -27,9 +27,10 @@ const ListSheets = ({navigation, route}) => {
     getSheets();
   }, []);
 
-  const navigateToAthletes = (id, name) => {
+  const navigateToAthletes = ({id, sheetId, title: name}) => {
     navigation.navigate('ListAthletes', {
-      sheetId: id,
+      spreadSheetid: id,
+      sheetId,
       sheetName: name,
     });
   };
@@ -46,6 +47,7 @@ const ListSheets = ({navigation, route}) => {
             renderItem={item => (
               <ListItem
                 id={spreadSheetId}
+                sheetId={item.item.properties.sheetId}
                 title={item.item.properties.title}
                 onPress={navigateToAthletes}
               />

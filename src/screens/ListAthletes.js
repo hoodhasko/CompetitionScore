@@ -8,14 +8,14 @@ import Loader from '../components/Loader';
 import ListItem from '../components/ListItem';
 import ButtonRefresh from '../components/ButtonRefresh';
 
-const ListAthletes = ({route}) => {
+const ListAthletes = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [athletes, setAthletes] = useState();
-  const {sheetId, sheetName} = route.params;
+  const {spreadSheetid, sheetId, sheetName} = route.params;
 
   const getAthletes = async () => {
     setIsLoading(true);
-    const athletes = await getAthletesFromSheet(sheetId, sheetName);
+    const athletes = await getAthletesFromSheet(spreadSheetid, sheetName);
 
     setAthletes(athletes);
 
@@ -27,6 +27,16 @@ const ListAthletes = ({route}) => {
   useEffect(() => {
     getAthletes();
   }, []);
+
+  const navigateToInputScore = ({id, title: name}) => {
+    navigation.navigate('InputScore', {
+      spreadSheetid: spreadSheetid,
+      sheetId: sheetId,
+      id,
+      name,
+      sheetName: sheetName,
+    });
+  };
 
   return (
     <SafeAreaView style={styles.root}>
@@ -41,7 +51,7 @@ const ListAthletes = ({route}) => {
               <ListItem
                 id={item.item.id}
                 title={item.item.name}
-                onPress={() => console.log('click')}
+                onPress={navigateToInputScore}
               />
             )}
             keyExtractor={item => item.id}

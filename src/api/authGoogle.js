@@ -25,6 +25,8 @@ export const signIn = async () => {
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
     // console.log(userInfo.user.email); get user email
+    await AsyncStorage.setItem('email', userInfo.user.email);
+
     const accessToken = (await GoogleSignin.getTokens()).accessToken;
     setTokenDate();
     await AsyncStorage.setItem('access_token', accessToken);
@@ -73,6 +75,9 @@ const getRefreshToken = async () => {
 
 export const checkToken = async () => {
   const accessToken = await AsyncStorage.getItem('access_token');
+
+  const email = await AsyncStorage.getItem('email');
+  console.log(email);
 
   if (accessToken === null) {
     console.log('oldToken');

@@ -50,6 +50,7 @@ export const getSheetsFromSpreadSheet = async spreadSheetid => {
 
 export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
   const accessToken = await getFreshToken();
+  console.log(accessToken);
 
   let rages = `${sheetName}!B24:B50`;
 

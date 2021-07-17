@@ -1,9 +1,11 @@
 import React from 'react';
 import {TouchableOpacity, Text, StyleSheet} from 'react-native';
 
-const ListItem = ({id, title, onPress}) => {
+const ListItem = ({id, sheetId, title, onPress}) => {
   return (
-    <TouchableOpacity style={styles.item} onPress={() => onPress(id, title)}>
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => onPress({id, sheetId, title})}>
       <Text style={styles.itemText}>{title}</Text>
     </TouchableOpacity>
   );
