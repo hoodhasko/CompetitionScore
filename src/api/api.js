@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {checkToken} from './authGoogle.js';
+import {range} from '../config/associate.js';
 
 const getFreshToken = async () => {
   await checkToken();
@@ -12,6 +13,7 @@ const getFreshToken = async () => {
 
 export const getFiles = async () => {
   const accessToken = await getFreshToken();
+  console.log(accessToken);
 
   const files = await fetch('https://www.googleapis.com/drive/v3/files', {
     method: 'GET',
@@ -50,11 +52,10 @@ export const getSheetsFromSpreadSheet = async spreadSheetid => {
 
 export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
   const accessToken = await getFreshToken();
-  console.log(accessToken);
 
-  let rages = `${sheetName}!B24:B50`;
+  let rages = `${sheetName}!B24:Q50`;
 
-  const res = await fetch(
+  const response = await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetid}/values:batchGet?ranges=${rages}`,
     {
       method: 'GET',
@@ -67,12 +68,73 @@ export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
     .then(res => res.json())
     .then(data => data);
 
-  const arrayV = res.valueRanges[0].values.map(item => item[0]);
+  const arrayValues = response.valueRanges[0].values;
 
-  const athletes = arrayV.map(item => ({
-    id: arrayV.indexOf(item),
-    name: item,
+  console.log(arrayValues);
+
+  const athletes = arrayValues.map((item, index) => ({
+    id: index,
+    name: item[0],
   }));
 
+  console.log(athletes);
   return athletes;
+};
+
+export const setValueIntoCell = async (spreadSheetId, sheetId, id, score) => {
+  const accessToken = await getFreshToken();
+  const email = await AsyncStorage.getItem('email');
+
+  const column = range[email];
+  const row = id + 24;
+
+  await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}:batchUpdate`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        requests: [
+          {
+            updateCells: {
+              fields: '*',
+              range: {
+                startColumnIndex: column - 1,
+                endColumnIndex: column,
+                startRowIndex: row - 1,
+                endRowIndex: row,
+                sheetId: sheetId,
+              },
+              rows: [
+                {
+                  values: [
+                    {
+                      userEnteredValue: {
+                        numberValue: score,
+                      },
+                      userEnteredFormat: {
+                        numberFormat: {
+                          pattern: '0.0',
+                          type: 'NUMBER',
+                        },
+                        textFormat: {
+                          fontSize: 14,
+                        },
+                        horizontalAlignment: 'CENTER',
+                        verticalAlignment: 'MIDDLE',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      }),
+    },
+  );
 };

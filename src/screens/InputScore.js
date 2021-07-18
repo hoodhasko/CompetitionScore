@@ -3,16 +3,21 @@ import {Pressable, Text, View, StyleSheet, TextInput} from 'react-native';
 
 import ScoreButton from '../components/ScoreButton.js';
 import Header from '../components/Header.js';
+import {setValueIntoCell} from '../api/api.js';
 
 const InputScore = ({route}) => {
   const [score, onChangeScore] = useState('');
-  const {spreadSheetId, sheetId, id, name} = route.params;
+  const {spreadSheetId, sheetId, id, sheetName, athleteName} = route.params;
 
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
+  const setScore = async value => {
+    await setValueIntoCell(spreadSheetId, sheetId, id, value);
+  };
+
   return (
     <View style={styles.root}>
-      <Header title={name} />
+      <Header title={athleteName} />
       <View style={styles.score}>
         <TextInput
           style={styles.input}
@@ -41,7 +46,7 @@ const InputScore = ({route}) => {
         ))}
       </View>
       <View style={styles.submit}>
-        <Pressable style={styles.btn} onPress={() => onChangeScore(25)}>
+        <Pressable style={styles.btn} onPress={() => setScore(score)}>
           <Text style={styles.btn_text}>Press</Text>
         </Pressable>
       </View>

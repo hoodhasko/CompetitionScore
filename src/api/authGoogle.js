@@ -76,9 +76,6 @@ const getRefreshToken = async () => {
 export const checkToken = async () => {
   const accessToken = await AsyncStorage.getItem('access_token');
 
-  const email = await AsyncStorage.getItem('email');
-  console.log(email);
-
   if (accessToken === null) {
     console.log('oldToken');
     await signIn();

@@ -11,15 +11,15 @@ import ButtonRefresh from '../components/ButtonRefresh';
 const ListAthletes = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [athletes, setAthletes] = useState();
-  const {spreadSheetid, sheetId, sheetName} = route.params;
+  const {spreadSheetId, sheetId, sheetName} = route.params;
 
   const getAthletes = async () => {
     setIsLoading(true);
-    const athletes = await getAthletesFromSheet(spreadSheetid, sheetName);
+    const arrayAthletes = await getAthletesFromSheet(spreadSheetId, sheetName);
 
-    setAthletes(athletes);
+    setAthletes(arrayAthletes);
 
-    if (athletes !== undefined) {
+    if (arrayAthletes !== undefined) {
       setIsLoading(false);
     }
   };
@@ -28,12 +28,12 @@ const ListAthletes = ({navigation, route}) => {
     getAthletes();
   }, []);
 
-  const navigateToInputScore = ({id, title: name}) => {
+  const navigateToInputScore = ({id, title}) => {
     navigation.navigate('InputScore', {
-      spreadSheetid: spreadSheetid,
+      spreadSheetId: spreadSheetId,
       sheetId: sheetId,
       id,
-      name,
+      athleteName: title,
       sheetName: sheetName,
     });
   };

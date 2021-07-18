@@ -29,7 +29,7 @@ const ListSheets = ({navigation, route}) => {
 
   const navigateToAthletes = ({id, sheetId, title: name}) => {
     navigation.navigate('ListAthletes', {
-      spreadSheetid: id,
+      spreadSheetId: id,
       sheetId,
       sheetName: name,
     });
