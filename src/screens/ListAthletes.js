@@ -28,13 +28,12 @@ const ListAthletes = ({navigation, route}) => {
     getAthletes();
   }, []);
 
-  const navigateToInputScore = ({id, title}) => {
+  const navigateToInputScore = ({id, title, score}) => {
     navigation.navigate('InputScore', {
       spreadSheetId: spreadSheetId,
-      sheetId: sheetId,
       id,
       athleteName: title,
-      sheetName: sheetName,
+      score,
     });
   };
 
@@ -51,6 +50,7 @@ const ListAthletes = ({navigation, route}) => {
               <ListItem
                 id={item.item.id}
                 title={item.item.name}
+                score={item.item.score}
                 onPress={navigateToInputScore}
               />
             )}

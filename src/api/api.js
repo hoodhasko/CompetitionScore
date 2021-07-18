@@ -52,6 +52,9 @@ export const getSheetsFromSpreadSheet = async spreadSheetid => {
 
 export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
   const accessToken = await getFreshToken();
+  const email = await AsyncStorage.getItem('email');
+
+  const column = range[email];
 
   let rages = `${sheetName}!B24:Q50`;
 
@@ -70,26 +73,27 @@ export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
 
   const arrayValues = response.valueRanges[0].values;
 
-  console.log(arrayValues);
+  const arrayWithoutEmpty = arrayValues.filter(item => item[0]);
 
-  const athletes = arrayValues.map((item, index) => ({
-    id: index,
-    name: item[0],
-  }));
+  const athletes = arrayWithoutEmpty.map((item, index) => {
+    return {
+      ...athletes,
+      id: index,
+      name: item[0],
+      score: item[column - 2],
+    };
+  });
 
-  console.log(athletes);
   return athletes;
 };
 
 export const setValueIntoCell = async (spreadSheetId, sheetId, id, score) => {
   const accessToken = await getFreshToken();
-  const email = await AsyncStorage.getItem('email');
 
-  const column = range[email];
   const row = id + 24;
 
   await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}:batchUpdate`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchUpdate`,
     {
       method: 'POST',
       headers: {
@@ -98,43 +102,38 @@ export const setValueIntoCell = async (spreadSheetId, sheetId, id, score) => {
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        requests: [
+        data: [
           {
-            updateCells: {
-              fields: '*',
-              range: {
-                startColumnIndex: column - 1,
-                endColumnIndex: column,
-                startRowIndex: row - 1,
-                endRowIndex: row,
-                sheetId: sheetId,
-              },
-              rows: [
-                {
-                  values: [
-                    {
-                      userEnteredValue: {
-                        numberValue: score,
-                      },
-                      userEnteredFormat: {
-                        numberFormat: {
-                          pattern: '0.0',
-                          type: 'NUMBER',
-                        },
-                        textFormat: {
-                          fontSize: 14,
-                        },
-                        horizontalAlignment: 'CENTER',
-                        verticalAlignment: 'MIDDLE',
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
+            range: `D${row}`,
+            values: [[score]],
           },
         ],
+        valueInputOption: 'USER_ENTERED',
       }),
     },
   );
 };
+
+// export const getValuesOfCell = async (spreadSheetId, sheetName) => {
+//   const accessToken = await getFreshToken();
+//   let rages = 'ИД2010!A1:A3';
+
+//   const response = await fetch(
+//     `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?ranges=${rages}`,
+//     {
+//       method: 'GET',
+//       headers: {
+//         Accept: 'application/json',
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     },
+//   )
+//     .then(res => res.json())
+//     .then(data => data);
+
+//   console.log(response);
+
+//   const arrayV = response.valueRanges[0].values.map(item => item[0]);
+
+//   console.log(arrayV);
+// };

@@ -1,18 +1,24 @@
 import React, {useState} from 'react';
-import {Pressable, Text, View, StyleSheet, TextInput} from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  View,
+  StyleSheet,
+  TextInput,
+} from 'react-native';
 
 import ScoreButton from '../components/ScoreButton.js';
 import Header from '../components/Header.js';
 import {setValueIntoCell} from '../api/api.js';
 
 const InputScore = ({route}) => {
-  const [score, onChangeScore] = useState('');
-  const {spreadSheetId, sheetId, id, sheetName, athleteName} = route.params;
+  const [newScore, onChangeNewScore] = useState('');
+  const {spreadSheetId, id, score, athleteName} = route.params;
 
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
   const setScore = async value => {
-    await setValueIntoCell(spreadSheetId, sheetId, id, value);
+    await setValueIntoCell(spreadSheetId, id, value);
   };
 
   return (
@@ -22,33 +28,37 @@ const InputScore = ({route}) => {
         <TextInput
           style={styles.input}
           placeholder="ОЦЕНКА"
-          onChangeText={onChangeScore}
+          onChangeText={onChangeNewScore}
           caretHidden
           editable={false}
           textAlign="center"
           maxLength={3}
-          value={score}
+          value={newScore}
         />
         <TextInput
           style={styles.input}
           placeholder="СБАВКА"
-          onChangeText={onChangeScore}
+          onChangeText={onChangeNewScore}
           caretHidden
           editable={false}
           textAlign="center"
           maxLength={3}
-          value={score}
+          value={newScore}
         />
       </View>
       <View style={styles.btnScore_group}>
         {numbers.map(number => (
-          <ScoreButton setValue={onChangeScore} value={number} key={number} />
+          <ScoreButton
+            setValue={onChangeNewScore}
+            value={number}
+            key={number}
+          />
         ))}
       </View>
       <View style={styles.submit}>
-        <Pressable style={styles.btn} onPress={() => setScore(score)}>
+        <TouchableOpacity style={styles.btn} onPress={() => setScore(newScore)}>
           <Text style={styles.btn_text}>Press</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
