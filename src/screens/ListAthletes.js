@@ -43,7 +43,7 @@ const ListAthletes = ({navigation, route}) => {
         <Loader />
       ) : (
         <View style={styles.listItems}>
-          <Header title="Спортсмены" />
+          <Header title="Спортсмены" buttonBack />
           <FlatList
             data={athletes}
             renderItem={item => (

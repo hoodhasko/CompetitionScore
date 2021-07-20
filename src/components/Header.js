@@ -1,14 +1,20 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-const Header = ({title}) => (
+import ButtonBack from './ButtonBack';
+
+const Header = ({title, buttonBack}) => (
   <View style={styles.header}>
+    {buttonBack && <ButtonBack />}
     <Text style={styles.headerText}>{title}</Text>
   </View>
 );
 
 const styles = StyleSheet.create({
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     height: 50,
     marginBottom: 4,
   },

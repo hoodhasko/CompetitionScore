@@ -41,7 +41,7 @@ const ListSheets = ({navigation, route}) => {
         <Loader />
       ) : (
         <View style={styles.listItems}>
-          <Header title="Номинация" />
+          <Header title="Номинация" buttonBack />
           <FlatList
             data={sheets}
             renderItem={item => (

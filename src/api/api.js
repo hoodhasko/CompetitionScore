@@ -83,14 +83,15 @@ export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
       score: item[column - 2],
     };
   });
+  console.log(athletes);
 
   return athletes;
 };
 
-export const setValueIntoCell = async (spreadSheetId, sheetId, id, score) => {
+export const setValueIntoCell = async (spreadSheetId, id, value) => {
   const accessToken = await getFreshToken();
 
-  const row = id + 24;
+  const row = Number(id) + 24;
 
   await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchUpdate`,
@@ -105,7 +106,7 @@ export const setValueIntoCell = async (spreadSheetId, sheetId, id, score) => {
         data: [
           {
             range: `D${row}`,
-            values: [[score]],
+            values: [[value]],
           },
         ],
         valueInputOption: 'USER_ENTERED',

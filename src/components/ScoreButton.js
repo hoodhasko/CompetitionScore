@@ -1,33 +1,38 @@
 import React from 'react';
 import {Pressable, Text, StyleSheet} from 'react-native';
 
-const ScoreButton = ({value, setValue}) => {
+const ScoreButton = ({value, setValue, disable}) => {
   return (
     <Pressable
-      style={styles.btnScore_number}
+      style={disable ? styles.disable : styles.btnScore_number}
       onPress={() => setValue(value)}
+      disabled={disable}
       android_ripple={{color: 'white', borderless: false}}>
       <Text style={styles.number}>{value}</Text>
     </Pressable>
   );
 };
 
+const baseBtnStyle = {
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginRight: 15,
+  marginLeft: 15,
+  marginBottom: 10,
+  width: 80,
+  height: 80,
+  borderRadius: 8,
+  elevation: 13,
+};
+
 const styles = StyleSheet.create({
   btnScore_number: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...baseBtnStyle,
     backgroundColor: 'orange',
-    marginRight: 15,
-    marginLeft: 15,
-    marginBottom: 10,
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    shadowOffset: {width: 0, height: 40},
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    elevation: 13,
-    shadowRadius: 2,
+  },
+  disable: {
+    ...baseBtnStyle,
+    backgroundColor: 'gray',
   },
   number: {
     fontSize: 30,
