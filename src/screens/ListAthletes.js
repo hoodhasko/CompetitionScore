@@ -11,29 +11,31 @@ import ButtonRefresh from '../components/ButtonRefresh';
 const ListAthletes = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [athletes, setAthletes] = useState();
-  const {spreadSheetId, sheetId, sheetName} = route.params;
+  const {spreadSheetId, sheetName} = route.params;
+
+  useEffect(() => {
+    getAthletes();
+  }, []);
 
   const getAthletes = async () => {
     setIsLoading(true);
     const arrayAthletes = await getAthletesFromSheet(spreadSheetId, sheetName);
 
-    setAthletes(arrayAthletes);
-
     if (arrayAthletes !== undefined) {
       setIsLoading(false);
     }
-  };
 
-  useEffect(() => {
-    getAthletes();
-  }, []);
+    setAthletes(arrayAthletes);
+  };
 
   const navigateToInputScore = ({id, title, score}) => {
     navigation.navigate('InputScore', {
       spreadSheetId: spreadSheetId,
       id,
       athleteName: title,
+      sheetName: sheetName,
       score,
+      getAthletes,
     });
   };
 

@@ -3,19 +3,23 @@ import {
   TouchableOpacity,
   Text,
   View,
+  SafeAreaView,
   StyleSheet,
   TextInput,
 } from 'react-native';
 
 import {setValueIntoCell} from '../api/api.js';
 import Header from '../components/Header.js';
+import Loader from '../components/Loader';
 import ButtonsScoreGroup from '../components/ButtonsScoreGroup.js';
 
 const InputScore = ({route}) => {
   const [newScore, onChangeNewScore] = useState('');
   const [disabledButtons, setDisabledButtons] = useState();
   const [disableSendButton, setDisableSendButton] = useState(true);
-  const {spreadSheetId, id, score, athleteName} = route.params;
+  const [loading, setLoading] = useState(false);
+  const {spreadSheetId, id, score, sheetName, athleteName, getAthletes} =
+    route.params;
 
   useEffect(() => {
     if (score) {
@@ -24,9 +28,14 @@ const InputScore = ({route}) => {
     }
   }, [score]);
 
-  const setScore = async value => {
-    // await setValueIntoCell(spreadSheetId, id, value);
-    console.log('click');
+  const sendScore = async value => {
+    setLoading(true);
+    await setValueIntoCell(spreadSheetId, id, value);
+    getAthletes();
+
+    setLoading(false);
+    setDisableSendButton(true);
+    setDisabledButtons(true);
   };
 
   useEffect(() => {
@@ -42,58 +51,66 @@ const InputScore = ({route}) => {
   }, [newScore]);
 
   return (
-    <View style={styles.root}>
-      <Header title={athleteName} buttonBack />
-      <View style={styles.score}>
-        <View style={styles.inputScore}>
-          <Text style={styles.labelInput}>ОЦЕНКА</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeNewScore}
-            caretHidden
-            editable={false}
-            textAlign="center"
-            maxLength={3}
-            value={newScore}
+    <SafeAreaView style={styles.root}>
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <View style={styles.header}>
+            <Header title={athleteName} buttonBack />
+          </View>
+          <View style={styles.score}>
+            <View style={styles.inputScore}>
+              <Text style={styles.labelInput}>ОЦЕНКА</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={onChangeNewScore}
+                caretHidden
+                editable={false}
+                textAlign="center"
+                maxLength={3}
+                value={newScore}
+              />
+            </View>
+            <View style={styles.inputScore}>
+              <Text style={styles.labelInput}>СБАВКА</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={onChangeNewScore}
+                caretHidden
+                editable={false}
+                textAlign="center"
+                maxLength={3}
+                value={newScore}
+              />
+            </View>
+          </View>
+          <ButtonsScoreGroup
+            newScore={newScore}
+            onChangeNewScore={onChangeNewScore}
+            disabled={disabledButtons}
           />
-        </View>
-        <View style={styles.inputScore}>
-          <Text style={styles.labelInput}>СБАВКА</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeNewScore}
-            caretHidden
-            editable={false}
-            textAlign="center"
-            maxLength={3}
-            value={newScore}
-          />
-        </View>
-      </View>
-      <ButtonsScoreGroup
-        newScore={newScore}
-        onChangeNewScore={onChangeNewScore}
-        disabled={disabledButtons}
-      />
-      <View style={styles.submit}>
-        <TouchableOpacity
-          style={styles.btn}
-          disabled={disableSendButton}
-          onPress={() => setScore(newScore)}>
-          <Text style={styles.btn_text}>Press</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <View style={styles.submit}>
+            <TouchableOpacity
+              style={styles.btn}
+              disabled={disableSendButton}
+              onPress={() => sendScore(newScore)}>
+              <Text style={styles.btn_text}>Press</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   root: {
+    alignItems: 'center',
     paddingHorizontal: 10,
   },
-  place: {
-    color: 'red',
-    fontSize: 20,
+  header: {
+    alignSelf: 'flex-start',
   },
   score: {
     alignItems: 'flex-end',

@@ -30,7 +30,6 @@ const ListSheets = ({navigation, route}) => {
   const navigateToAthletes = ({id, sheetId, title: name}) => {
     navigation.navigate('ListAthletes', {
       spreadSheetId: id,
-      sheetId,
       sheetName: name,
     });
   };
