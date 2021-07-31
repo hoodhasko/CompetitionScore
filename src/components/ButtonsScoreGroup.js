@@ -3,7 +3,8 @@ import {View, StyleSheet} from 'react-native';
 
 import ScoreButton from './ScoreButton.js';
 
-const ButtonsScoreGroup = ({newScore, onChangeNewScore, disabled}) => {
+const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
+  console.log(disabled);
   const [disableNumber, setDisableNumber] = useState(false);
   const [disableComma, setDisableComma] = useState(true);
   const [disableDelete, setDisableDelete] = useState(true);
@@ -14,19 +15,19 @@ const ButtonsScoreGroup = ({newScore, onChangeNewScore, disabled}) => {
   const setScore = v => {
     const value = newScore + v;
 
-    onChangeNewScore(value);
+    setNewScore(value);
   };
 
   const setComma = () => {
     const value = newScore + ',';
 
-    onChangeNewScore(value);
+    setNewScore(value);
   };
 
   const deleteScore = () => {
     const value = newScore.slice(0, -1);
 
-    onChangeNewScore(value);
+    setNewScore(value);
   };
 
   useEffect(() => {

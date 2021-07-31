@@ -12,43 +12,106 @@ import {setValueIntoCell} from '../api/api.js';
 import Header from '../components/Header.js';
 import Loader from '../components/Loader';
 import ButtonsScoreGroup from '../components/ButtonsScoreGroup.js';
+import ButtonToggleAthlete from '../components/ButtonToggleAthlete.js';
 
-const InputScore = ({route}) => {
-  const [newScore, onChangeNewScore] = useState('');
+const InputScore = ({navigation, route}) => {
+  const [newScore, setNewScore] = useState('');
+  const [name, setName] = useState('');
+  const [idAthlete, setIdAthlete] = useState('');
+
   const [disabledButtons, setDisabledButtons] = useState();
-  const [disableSendButton, setDisableSendButton] = useState(true);
+  const [disableSendButton, setDisableSendButton] = useState(false);
+  const [disablePrevButton, setDisablePrevButton] = useState(false);
+  const [disableNextButton, setDisableNextButton] = useState(false);
   const [loading, setLoading] = useState(false);
-  const {spreadSheetId, id, score, sheetName, athleteName, getAthletes} =
+
+  const {spreadSheetId, id, score, athleteName, athletes, getAthletes} =
     route.params;
 
   useEffect(() => {
+    setName(athleteName);
+    setIdAthlete(id);
+    setNewScore(score);
     if (score) {
-      onChangeNewScore(score);
       setDisabledButtons(true);
+      setDisableSendButton(true);
     }
-  }, [score]);
+  }, [score, athleteName, id]);
+
+  useEffect(() => {
+    if (idAthlete === 0) {
+      setDisablePrevButton(true);
+    } else {
+      setDisablePrevButton(false);
+    }
+
+    if (idAthlete === athletes.length - 1) {
+      setDisableNextButton(true);
+    } else {
+      setDisableNextButton(false);
+    }
+  }, [idAthlete, athletes]);
 
   const sendScore = async value => {
     setLoading(true);
-    await setValueIntoCell(spreadSheetId, id, value);
+
+    await setValueIntoCell(spreadSheetId, idAthlete, value);
+    const athlete = athletes.filter(ath => ath.id === idAthlete)[0];
+    athlete.score = value;
+
     getAthletes();
 
     setLoading(false);
     setDisableSendButton(true);
     setDisabledButtons(true);
+    setDisableNextButton(false);
+    setDisablePrevButton(false);
+  };
+
+  const toggleAthlete = idToggleAthlete => {
+    const athlete = athletes.filter(ath => ath.id === idToggleAthlete)[0];
+
+    navigation.navigate('InputScore', {
+      spreadSheetId: spreadSheetId,
+      id: athlete.id,
+      athleteName: athlete.name,
+      score: athlete.score,
+      athletes: athletes,
+      getAthletes,
+    });
+
+    // setName(athlete.name);
+    // setNewScore(athlete.score);
+    // setIdAthlete(idToggleAthlete);
+
+    // if (athlete.score !== '') {
+    //   console.log(athlete.score);
+
+    //   setDisableSendButton(true);
+    // }
   };
 
   useEffect(() => {
-    if (newScore.length === 0) {
-      setDisableSendButton(true);
-    } else if (newScore.length === 1) {
-      setDisableSendButton(false);
-    } else if (newScore.length === 2) {
-      setDisableSendButton(true);
-    } else {
-      setDisableSendButton(false);
+    if (!score) {
+      if (newScore.length === 0) {
+        setDisableSendButton(true);
+        setDisableNextButton(false);
+        setDisablePrevButton(false);
+      } else if (newScore.length === 1) {
+        setDisableSendButton(true);
+        setDisableNextButton(true);
+        setDisablePrevButton(true);
+      } else if (newScore.length === 2) {
+        setDisableSendButton(true);
+        setDisableNextButton(true);
+        setDisablePrevButton(true);
+      } else {
+        setDisableSendButton(false);
+        setDisableNextButton(true);
+        setDisablePrevButton(true);
+      }
     }
-  }, [newScore]);
+  }, [newScore, score]);
 
   return (
     <SafeAreaView style={styles.root}>
@@ -57,14 +120,14 @@ const InputScore = ({route}) => {
       ) : (
         <>
           <View style={styles.header}>
-            <Header title={athleteName} buttonBack />
+            <Header title={name} buttonBack />
           </View>
           <View style={styles.score}>
             <View style={styles.inputScore}>
               <Text style={styles.labelInput}>ОЦЕНКА</Text>
               <TextInput
                 style={styles.input}
-                onChangeText={onChangeNewScore}
+                onChangeText={setNewScore}
                 caretHidden
                 editable={false}
                 textAlign="center"
@@ -76,7 +139,7 @@ const InputScore = ({route}) => {
               <Text style={styles.labelInput}>СБАВКА</Text>
               <TextInput
                 style={styles.input}
-                onChangeText={onChangeNewScore}
+                onChangeText={setNewScore}
                 caretHidden
                 editable={false}
                 textAlign="center"
@@ -87,21 +150,43 @@ const InputScore = ({route}) => {
           </View>
           <ButtonsScoreGroup
             newScore={newScore}
-            onChangeNewScore={onChangeNewScore}
+            setNewScore={setNewScore}
             disabled={disabledButtons}
           />
-          <View style={styles.submit}>
+          <View style={styles.btnPanel}>
+            <ButtonToggleAthlete
+              text={'СЛЕД'}
+              disabled={disablePrevButton}
+              onPress={() => toggleAthlete(idAthlete - 1)}
+            />
             <TouchableOpacity
-              style={styles.btn}
+              style={
+                disableSendButton
+                  ? styles.buttonSubmitDisable
+                  : styles.buttonSubmit
+              }
               disabled={disableSendButton}
               onPress={() => sendScore(newScore)}>
-              <Text style={styles.btn_text}>Press</Text>
+              <Text style={styles.buttonSubmitText}>Press</Text>
             </TouchableOpacity>
+            <ButtonToggleAthlete
+              text={'ПРЕД'}
+              disabled={disableNextButton}
+              onPress={() => toggleAthlete(idAthlete + 1)}
+            />
           </View>
         </>
       )}
     </SafeAreaView>
   );
+};
+
+const baseButtonSubmit = {
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 200,
+  height: 60,
+  borderRadius: 30,
 };
 
 const styles = StyleSheet.create({
@@ -139,21 +224,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: 'black',
   },
-  submit: {
+  btnPanel: {
+    flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     height: '20%',
   },
-  btn: {
-    backgroundColor: 'black',
-    alignItems: 'center',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    width: 200,
-    height: 60,
-    borderRadius: 30,
-    overflow: 'hidden',
+  buttonSubmit: {
+    ...baseButtonSubmit,
+    backgroundColor: '#6ABE5D',
   },
-  btn_text: {
+  buttonSubmitDisable: {
+    ...baseButtonSubmit,
+    backgroundColor: '#868686',
+  },
+  buttonSubmitText: {
     color: 'white',
     fontSize: 20,
   },

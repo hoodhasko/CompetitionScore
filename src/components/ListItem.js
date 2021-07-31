@@ -13,7 +13,6 @@ const ListItem = ({id, sheetId, title, score, onPress}) => {
 
 const styles = StyleSheet.create({
   item: {
-    // height: 60,
     minHeight: 60,
     backgroundColor: 'white',
     marginBottom: 10,

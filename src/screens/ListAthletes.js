@@ -33,8 +33,8 @@ const ListAthletes = ({navigation, route}) => {
       spreadSheetId: spreadSheetId,
       id,
       athleteName: title,
-      sheetName: sheetName,
       score,
+      athletes: athletes,
       getAthletes,
     });
   };

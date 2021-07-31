@@ -28,11 +28,11 @@ const baseBtnStyle = {
 const styles = StyleSheet.create({
   btnScore_number: {
     ...baseBtnStyle,
-    backgroundColor: 'orange',
+    backgroundColor: '#F9A221',
   },
   disable: {
     ...baseBtnStyle,
-    backgroundColor: 'gray',
+    backgroundColor: '#868686',
   },
   number: {
     fontSize: 30,
