@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {SafeAreaView, View, FlatList, StyleSheet} from 'react-native';
+import {SafeAreaView, View, FlatList, Text, StyleSheet} from 'react-native';
 
 import {getAthletesFromSheet} from '../api/api';
 
@@ -11,7 +11,7 @@ import ButtonRefresh from '../components/ButtonRefresh';
 const ListAthletes = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [athletes, setAthletes] = useState();
-  const {spreadSheetId, sheetName} = route.params;
+  const {spreadSheetId, category, sheetName} = route.params;
 
   useEffect(() => {
     getAthletes();
@@ -33,6 +33,8 @@ const ListAthletes = ({navigation, route}) => {
       spreadSheetId: spreadSheetId,
       id,
       athleteName: title,
+      category: category,
+      nomination: sheetName,
       score,
       athletes: athletes,
       getAthletes,
@@ -46,6 +48,9 @@ const ListAthletes = ({navigation, route}) => {
       ) : (
         <View style={styles.listItems}>
           <Header title="Спортсмены" buttonBack />
+          <Text style={styles.subTitle}>
+            Категория: {category} Номинация: {sheetName}
+          </Text>
           <FlatList
             data={athletes}
             renderItem={item => (
@@ -77,6 +82,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: '100%',
     height: '100%',
+  },
+  subTitle: {
+    fontSize: 20,
+    marginBottom: 4,
   },
 });
 

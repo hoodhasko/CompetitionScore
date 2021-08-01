@@ -15,13 +15,19 @@ const ButtonBack = () => {
 
 const styles = StyleSheet.create({
   button: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
-    backgroundColor: '#FF6C65',
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    top: 2,
     alignItems: 'center',
+    alignSelf: 'center',
     justifyContent: 'center',
+    backgroundColor: '#FF6C65',
     marginRight: 8,
+  },
+  backIcon: {
+    height: 25,
+    width: 25,
   },
 });
 

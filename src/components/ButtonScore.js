@@ -1,7 +1,7 @@
 import React from 'react';
 import {Pressable, Text, StyleSheet} from 'react-native';
 
-const ScoreButton = ({value, setValue, disable}) => {
+const ButtonScore = ({value, setValue, disable}) => {
   return (
     <Pressable
       style={disable ? styles.disable : styles.btnScore_number}
@@ -22,7 +22,7 @@ const baseBtnStyle = {
   width: 80,
   height: 80,
   borderRadius: 8,
-  elevation: 13,
+  // elevation: 13,
 };
 
 const styles = StyleSheet.create({
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScoreButton;
+export default ButtonScore;

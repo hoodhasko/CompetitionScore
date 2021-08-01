@@ -25,8 +25,16 @@ const InputScore = ({navigation, route}) => {
   const [disableNextButton, setDisableNextButton] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const {spreadSheetId, id, score, athleteName, athletes, getAthletes} =
-    route.params;
+  const {
+    spreadSheetId,
+    id,
+    score,
+    athleteName,
+    category,
+    nomination,
+    athletes,
+    getAthletes,
+  } = route.params;
 
   useEffect(() => {
     setName(athleteName);
@@ -38,18 +46,22 @@ const InputScore = ({navigation, route}) => {
     }
   }, [score, athleteName, id]);
 
-  useEffect(() => {
-    if (idAthlete === 0) {
+  const toggleDisableNextPrevButtons = (idA, arrayA) => {
+    if (idA === 0) {
       setDisablePrevButton(true);
     } else {
       setDisablePrevButton(false);
     }
 
-    if (idAthlete === athletes.length - 1) {
+    if (idA === arrayA.length - 1) {
       setDisableNextButton(true);
     } else {
       setDisableNextButton(false);
     }
+  };
+
+  useEffect(() => {
+    toggleDisableNextPrevButtons(idAthlete, athletes);
   }, [idAthlete, athletes]);
 
   const sendScore = async value => {
@@ -64,31 +76,22 @@ const InputScore = ({navigation, route}) => {
     setLoading(false);
     setDisableSendButton(true);
     setDisabledButtons(true);
-    setDisableNextButton(false);
-    setDisablePrevButton(false);
+    toggleDisableNextPrevButtons(idAthlete, athletes);
   };
 
   const toggleAthlete = idToggleAthlete => {
     const athlete = athletes.filter(ath => ath.id === idToggleAthlete)[0];
 
-    navigation.navigate('InputScore', {
-      spreadSheetId: spreadSheetId,
-      id: athlete.id,
-      athleteName: athlete.name,
-      score: athlete.score,
-      athletes: athletes,
-      getAthletes,
-    });
-
-    // setName(athlete.name);
-    // setNewScore(athlete.score);
-    // setIdAthlete(idToggleAthlete);
-
-    // if (athlete.score !== '') {
-    //   console.log(athlete.score);
-
-    //   setDisableSendButton(true);
-    // }
+    if (athlete) {
+      navigation.navigate('InputScore', {
+        spreadSheetId: spreadSheetId,
+        id: athlete.id,
+        athleteName: athlete.name,
+        score: athlete.score,
+        athletes: athletes,
+        getAthletes,
+      });
+    }
   };
 
   useEffect(() => {
@@ -121,6 +124,9 @@ const InputScore = ({navigation, route}) => {
         <>
           <View style={styles.header}>
             <Header title={name} buttonBack />
+            <Text style={styles.subTitle}>
+              Категория: {category} Номинация: {nomination}
+            </Text>
           </View>
           <View style={styles.score}>
             <View style={styles.inputScore}>
@@ -155,7 +161,7 @@ const InputScore = ({navigation, route}) => {
           />
           <View style={styles.btnPanel}>
             <ButtonToggleAthlete
-              text={'СЛЕД'}
+              text={'ПРЕД'}
               disabled={disablePrevButton}
               onPress={() => toggleAthlete(idAthlete - 1)}
             />
@@ -170,7 +176,7 @@ const InputScore = ({navigation, route}) => {
               <Text style={styles.buttonSubmitText}>Press</Text>
             </TouchableOpacity>
             <ButtonToggleAthlete
-              text={'ПРЕД'}
+              text={'СЛЕД'}
               disabled={disableNextButton}
               onPress={() => toggleAthlete(idAthlete + 1)}
             />
@@ -197,6 +203,10 @@ const styles = StyleSheet.create({
   header: {
     alignSelf: 'flex-start',
   },
+  subTitle: {
+    fontSize: 20,
+    marginBottom: 4,
+  },
   score: {
     alignItems: 'flex-end',
     marginRight: 145,
@@ -205,7 +215,7 @@ const styles = StyleSheet.create({
     height: 70,
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: 6,
   },
   labelInput: {
     bottom: 10,
@@ -228,7 +238,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '20%',
+    // height: '20%',
   },
   buttonSubmit: {
     ...baseButtonSubmit,

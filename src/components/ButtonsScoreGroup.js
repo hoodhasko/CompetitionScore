@@ -1,10 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
 
-import ScoreButton from './ScoreButton.js';
+import ButtonScore from './ButtonScore.js';
 
 const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
-  console.log(disabled);
   const [disableNumber, setDisableNumber] = useState(false);
   const [disableComma, setDisableComma] = useState(true);
   const [disableDelete, setDisableDelete] = useState(true);
@@ -60,15 +59,15 @@ const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
   return (
     <View style={styles.btnScore_group}>
       {numbers.map(number => (
-        <ScoreButton
+        <ButtonScore
           setValue={setScore}
           value={number}
           key={number}
           disable={disableNumber}
         />
       ))}
-      <ScoreButton setValue={setComma} value={comma} disable={disableComma} />
-      <ScoreButton
+      <ButtonScore setValue={setComma} value={comma} disable={disableComma} />
+      <ButtonScore
         setValue={deleteScore}
         value={'DEL'}
         disable={disableDelete}
@@ -79,7 +78,6 @@ const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
 
 const styles = StyleSheet.create({
   btnScore_group: {
-    top: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',

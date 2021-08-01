@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {SafeAreaView, View, FlatList, StyleSheet} from 'react-native';
+import {SafeAreaView, View, FlatList, Text, StyleSheet} from 'react-native';
 
 import {getSheetsFromSpreadSheet} from '../api/api';
 
@@ -11,7 +11,7 @@ import ButtonRefresh from '../components/ButtonRefresh';
 const ListSheets = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [sheets, setSheets] = useState();
-  const {spreadSheetId} = route.params;
+  const {spreadSheetId, category} = route.params;
 
   const getSheets = async () => {
     setIsLoading(true);
@@ -27,10 +27,11 @@ const ListSheets = ({navigation, route}) => {
     getSheets();
   }, []);
 
-  const navigateToAthletes = ({id, sheetId, title: name}) => {
+  const navigateToAthletes = ({id, title: name}) => {
     navigation.navigate('ListAthletes', {
       spreadSheetId: id,
       sheetName: name,
+      category: category,
     });
   };
 
@@ -41,6 +42,7 @@ const ListSheets = ({navigation, route}) => {
       ) : (
         <View style={styles.listItems}>
           <Header title="Номинация" buttonBack />
+          <Text style={styles.subTitle}>Категория: {category}</Text>
           <FlatList
             data={sheets}
             renderItem={item => (
@@ -72,6 +74,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: '100%',
     height: '100%',
+  },
+  subTitle: {
+    fontSize: 20,
+    marginBottom: 4,
   },
 });
 
