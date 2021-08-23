@@ -76,6 +76,8 @@ const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
   );
 };
 
+//Test SSH
+
 const styles = StyleSheet.create({
   btnScore_group: {
     flexDirection: 'row',
