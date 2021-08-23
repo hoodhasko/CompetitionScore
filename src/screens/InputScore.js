@@ -173,7 +173,7 @@ const InputScore = ({navigation, route}) => {
               }
               disabled={disableSendButton}
               onPress={() => sendScore(newScore)}>
-              <Text style={styles.buttonSubmitText}>Press</Text>
+              <Text style={styles.buttonSubmitText}>ОТПРАВИТЬ</Text>
             </TouchableOpacity>
             <ButtonToggleAthlete
               text={'СЛЕД'}
