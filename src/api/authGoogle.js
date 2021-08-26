@@ -77,7 +77,6 @@ export const checkToken = async () => {
   const accessToken = await AsyncStorage.getItem('access_token');
 
   if (accessToken === null) {
-    console.log('oldToken');
     await signIn();
   } else {
     const tokenDate = await AsyncStorage.getItem('token_date');

@@ -3,7 +3,7 @@ import {View, StyleSheet} from 'react-native';
 
 import ButtonScore from './ButtonScore.js';
 
-const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
+const ButtonsScoreGroup = ({currentValue, setCurrentValue, disabled}) => {
   const [disableNumber, setDisableNumber] = useState(false);
   const [disableComma, setDisableComma] = useState(true);
   const [disableDelete, setDisableDelete] = useState(true);
@@ -12,21 +12,21 @@ const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
   const comma = ',';
 
   const setScore = v => {
-    const value = newScore + v;
+    const value = currentValue + v;
 
-    setNewScore(value);
+    setCurrentValue(value);
   };
 
   const setComma = () => {
-    const value = newScore + ',';
+    const value = currentValue + ',';
 
-    setNewScore(value);
+    setCurrentValue(value);
   };
 
   const deleteScore = () => {
-    const value = newScore.slice(0, -1);
+    const value = currentValue.slice(0, -1);
 
-    setNewScore(value);
+    setCurrentValue(value);
   };
 
   useEffect(() => {
@@ -38,23 +38,26 @@ const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
   }, [disabled]);
 
   useEffect(() => {
-    const lengthScore = newScore.length;
-    if (lengthScore === 0) {
-      setDisableNumber(false);
-      setDisableComma(true);
-      setDisableDelete(true);
-    } else if (lengthScore === 1) {
-      setDisableNumber(true);
-      setDisableComma(false);
-      setDisableDelete(false);
-    } else if (lengthScore === 2) {
-      setDisableNumber(false);
-      setDisableComma(true);
-      setDisableDelete(false);
-    } else {
-      setDisableNumber(true);
+    if (!disabled) {
+      let lengthCurrentValue = currentValue.length;
+      if (lengthCurrentValue === 0) {
+        setDisableNumber(false);
+        setDisableComma(true);
+        setDisableDelete(true);
+      } else if (lengthCurrentValue === 1) {
+        setDisableNumber(true);
+        setDisableComma(false);
+        setDisableDelete(false);
+      } else if (lengthCurrentValue === 2) {
+        setDisableNumber(false);
+        setDisableComma(true);
+        setDisableDelete(false);
+      } else {
+        setDisableNumber(true);
+        setDisableDelete(false);
+      }
     }
-  }, [newScore]);
+  }, [currentValue, disabled]);
 
   return (
     <View style={styles.btnScore_group}>
@@ -75,8 +78,6 @@ const ButtonsScoreGroup = ({newScore, setNewScore, disabled}) => {
     </View>
   );
 };
-
-//Test SSH
 
 const styles = StyleSheet.create({
   btnScore_group: {

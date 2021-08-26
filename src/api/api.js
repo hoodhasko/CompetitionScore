@@ -13,7 +13,6 @@ const getFreshToken = async () => {
 
 export const getFiles = async () => {
   const accessToken = await getFreshToken();
-  console.log(accessToken);
 
   const files = await fetch('https://www.googleapis.com/drive/v3/files', {
     method: 'GET',
@@ -50,16 +49,21 @@ export const getSheetsFromSpreadSheet = async spreadSheetid => {
   return sheets;
 };
 
-export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
+/*
+Получить список спортсменов
+Параметры: id книги, название листа
+*/
+export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
   const accessToken = await getFreshToken();
   const email = await AsyncStorage.getItem('email');
 
-  const column = range[email];
+  const indexColumnScore = range[email].scoreColumn; //Получаем индекс столбца с оценкой по email
+  const accessToDecline = range[email]?.decline; //Смотрим есть ли у данного email разрешение на получение сбавки
 
-  let rages = `${sheetName}!B24:Q50`;
+  let rages = `${sheetName}!A24:Q50`;
 
   const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetid}/values:batchGet?ranges=${rages}`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?ranges=${rages}`,
     {
       method: 'GET',
       headers: {
@@ -73,25 +77,35 @@ export const getAthletesFromSheet = async (spreadSheetid, sheetName) => {
 
   const arrayValues = response.valueRanges[0].values;
 
-  const arrayWithoutEmpty = arrayValues.filter(item => item[0]);
+  const arrayWithoutEmpty = arrayValues.filter(item => item[1]);
 
   const athletes = arrayWithoutEmpty.map((item, index) => {
     return {
       ...athletes,
       id: index,
-      name: item[0],
-      score: item[column - 2],
+      name: item[1],
+      score: item[indexColumnScore],
+      decline: accessToDecline ? item[13] : null,
     };
   });
-  console.log(athletes);
 
   return athletes;
 };
 
-export const setValueIntoCell = async (spreadSheetId, id, value) => {
+/*
+Отправка оценки
+Параметры: id книги, индекс спортсмена в таблице, оценка, сбавка
+Если у пользователя нет доступа к сбавки приходит null и сбавка не отправляется
+*/
+export const setValueIntoCell = async (
+  spreadSheetId,
+  indexAthlete,
+  valueScore,
+  valueDecline,
+) => {
   const accessToken = await getFreshToken();
 
-  const row = Number(id) + 24;
+  const row = Number(indexAthlete) + 24;
 
   await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchUpdate`,
@@ -106,7 +120,11 @@ export const setValueIntoCell = async (spreadSheetId, id, value) => {
         data: [
           {
             range: `D${row}`,
-            values: [[value]],
+            values: [[valueScore]],
+          },
+          {
+            range: `N${row}`,
+            values: [[valueDecline]],
           },
         ],
         valueInputOption: 'USER_ENTERED',

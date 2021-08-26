@@ -16,19 +16,29 @@ import ButtonToggleAthlete from '../components/ButtonToggleAthlete.js';
 
 const InputScore = ({navigation, route}) => {
   const [newScore, setNewScore] = useState('');
+  const [newDecline, setNewDecline] = useState('');
+  const [currentValue, setCurrentValue] = useState('');
   const [name, setName] = useState('');
   const [idAthlete, setIdAthlete] = useState('');
+  const [typeInput, setTypeInput] = useState('score');
 
-  const [disabledButtons, setDisabledButtons] = useState();
+  const [disabledButtons, setDisabledButtons] = useState(false);
   const [disableSendButton, setDisableSendButton] = useState(false);
   const [disablePrevButton, setDisablePrevButton] = useState(false);
   const [disableNextButton, setDisableNextButton] = useState(false);
+  const [disableInput, setDisableInput] = useState(true);
+  const [activeScoreInput, setActiveScoreInput] = useState(true);
+  const [activeDeclineInput, setActiveDeclineInput] = useState(false);
+  const [inputBorderGreen, setInputBorderGreen] = useState(false);
+
+  const [showDeclineInput, setShowDeclineInput] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const {
     spreadSheetId,
     id,
     score,
+    decline,
     athleteName,
     category,
     nomination,
@@ -39,12 +49,29 @@ const InputScore = ({navigation, route}) => {
   useEffect(() => {
     setName(athleteName);
     setIdAthlete(id);
-    setNewScore(score);
     if (score) {
+      setCurrentValue(score);
+      setNewScore(score);
+      decline && setNewDecline(decline);
+
       setDisabledButtons(true);
       setDisableSendButton(true);
+      setDisableInput(true);
+
+      setInputBorderGreen(true);
+    } else {
+      setCurrentValue('');
+      setNewScore('');
+      setNewDecline('');
+
+      setDisabledButtons(false);
+      setDisableInput(false);
+      setInputBorderGreen(false);
     }
-  }, [score, athleteName, id]);
+    if (decline === null) {
+      setShowDeclineInput(false);
+    }
+  }, [score, decline, athleteName, id]);
 
   const toggleDisableNextPrevButtons = (idA, arrayA) => {
     if (idA === 0) {
@@ -64,18 +91,25 @@ const InputScore = ({navigation, route}) => {
     toggleDisableNextPrevButtons(idAthlete, athletes);
   }, [idAthlete, athletes]);
 
-  const sendScore = async value => {
+  const sendScore = async (valueScore, valueDecline) => {
     setLoading(true);
 
-    await setValueIntoCell(spreadSheetId, idAthlete, value);
+    if (valueDecline.length === 0) {
+      valueDecline = null;
+    }
+
+    await setValueIntoCell(spreadSheetId, idAthlete, valueScore, valueDecline);
     const athlete = athletes.filter(ath => ath.id === idAthlete)[0];
-    athlete.score = value;
+    athlete.score = valueScore;
+    athlete.decline = valueDecline;
 
     getAthletes();
 
     setLoading(false);
     setDisableSendButton(true);
     setDisabledButtons(true);
+    setDisableInput(true);
+    setInputBorderGreen(true);
     toggleDisableNextPrevButtons(idAthlete, athletes);
   };
 
@@ -88,6 +122,7 @@ const InputScore = ({navigation, route}) => {
         id: athlete.id,
         athleteName: athlete.name,
         score: athlete.score,
+        decline: athlete.decline,
         athletes: athletes,
         getAthletes,
       });
@@ -95,16 +130,18 @@ const InputScore = ({navigation, route}) => {
   };
 
   useEffect(() => {
+    let lengthScore = newScore.length;
+    let lengthDecline = newDecline.length;
     if (!score) {
-      if (newScore.length === 0) {
+      if (lengthScore === 0) {
         setDisableSendButton(true);
         setDisableNextButton(false);
         setDisablePrevButton(false);
-      } else if (newScore.length === 1) {
+      } else if (lengthScore === 1 || lengthDecline === 1) {
         setDisableSendButton(true);
         setDisableNextButton(true);
         setDisablePrevButton(true);
-      } else if (newScore.length === 2) {
+      } else if (lengthScore === 2 || lengthDecline === 2) {
         setDisableSendButton(true);
         setDisableNextButton(true);
         setDisablePrevButton(true);
@@ -114,7 +151,33 @@ const InputScore = ({navigation, route}) => {
         setDisablePrevButton(true);
       }
     }
-  }, [newScore, score]);
+  }, [newScore, newDecline, score]);
+
+  const PressOnInput = (value, type) => {
+    if (currentValue.length === 1 || currentValue.length === 2) {
+      return;
+    }
+    setTypeInput(type);
+    if (type === 'score') {
+      setActiveDeclineInput(false);
+      setActiveScoreInput(true);
+
+      setCurrentValue(value);
+    } else {
+      setActiveScoreInput(false);
+      setActiveDeclineInput(true);
+
+      setCurrentValue(value);
+    }
+  };
+
+  useEffect(() => {
+    if (typeInput === 'score') {
+      setNewScore(currentValue);
+    } else {
+      setNewDecline(currentValue);
+    }
+  }, [currentValue, typeInput]);
 
   return (
     <SafeAreaView style={styles.root}>
@@ -132,31 +195,50 @@ const InputScore = ({navigation, route}) => {
             <View style={styles.inputScore}>
               <Text style={styles.labelInput}>ОЦЕНКА</Text>
               <TextInput
-                style={styles.input}
+                style={
+                  inputBorderGreen
+                    ? styles.inputGreen
+                    : activeScoreInput
+                    ? styles.inputOrange
+                    : styles.inputBlue
+                }
                 onChangeText={setNewScore}
                 caretHidden
-                editable={false}
+                editable={!disableInput}
                 textAlign="center"
                 maxLength={3}
                 value={newScore}
+                onPressIn={() => PressOnInput(newScore, 'score')}
+                showSoftInputOnFocus={false}
               />
             </View>
-            <View style={styles.inputScore}>
-              <Text style={styles.labelInput}>СБАВКА</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={setNewScore}
-                caretHidden
-                editable={false}
-                textAlign="center"
-                maxLength={3}
-                value={newScore}
-              />
-            </View>
+            {showDeclineInput && (
+              <View style={styles.inputScore}>
+                <Text style={styles.labelInput}>СБАВКА</Text>
+                <TextInput
+                  style={
+                    inputBorderGreen
+                      ? styles.inputGreen
+                      : activeDeclineInput
+                      ? styles.inputOrange
+                      : styles.inputBlue
+                  }
+                  onChangeText={setNewDecline}
+                  caretHidden
+                  editable={!disableInput}
+                  textAlign="center"
+                  maxLength={3}
+                  value={newDecline}
+                  onPressIn={() => PressOnInput(newDecline, 'decline')}
+                  showSoftInputOnFocus={false}
+                />
+              </View>
+            )}
           </View>
           <ButtonsScoreGroup
-            newScore={newScore}
-            setNewScore={setNewScore}
+            currentValue={currentValue}
+            setCurrentValue={setCurrentValue}
+            typeInput={typeInput}
             disabled={disabledButtons}
           />
           <View style={styles.btnPanel}>
@@ -172,7 +254,7 @@ const InputScore = ({navigation, route}) => {
                   : styles.buttonSubmit
               }
               disabled={disableSendButton}
-              onPress={() => sendScore(newScore)}>
+              onPress={() => sendScore(newScore, newDecline)}>
               <Text style={styles.buttonSubmitText}>ОТПРАВИТЬ</Text>
             </TouchableOpacity>
             <ButtonToggleAthlete
@@ -193,6 +275,18 @@ const baseButtonSubmit = {
   width: 200,
   height: 60,
   borderRadius: 30,
+};
+
+const input = {
+  alignSelf: 'center',
+  height: '100%',
+  width: 100,
+  fontSize: 36,
+  fontWeight: '700',
+  borderWidth: 3,
+  borderRadius: 6,
+  marginBottom: 20,
+  color: 'black',
 };
 
 const styles = StyleSheet.create({
@@ -222,23 +316,22 @@ const styles = StyleSheet.create({
     marginRight: 12,
     fontSize: 30,
   },
-  input: {
-    alignSelf: 'center',
-    height: '100%',
-    width: 100,
-    fontSize: 36,
-    fontWeight: '700',
-    borderWidth: 1,
-    borderRadius: 6,
-    borderColor: 'red',
-    marginBottom: 20,
-    color: 'black',
+  inputBlue: {
+    ...input,
+    borderColor: '#2191F9',
+  },
+  inputOrange: {
+    ...input,
+    borderColor: '#F9A221',
+  },
+  inputGreen: {
+    ...input,
+    borderColor: 'green',
   },
   btnPanel: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    // height: '20%',
   },
   buttonSubmit: {
     ...baseButtonSubmit,

@@ -17,5 +17,6 @@ export const range = {
   'b2.judge.art7@gmail.com': 11,
   'b2.judge.art8@gmail.com': 12,
   'b2.judge.sl@gmail.com': 14,
-  'bestscoreapp@gmail.com': 4,
+  'bestscoreapp@gmail.com': {scoreColumn: 3, decline: false},
+  // 'bestscoreapp@gmail.com': [5, 17],
 };

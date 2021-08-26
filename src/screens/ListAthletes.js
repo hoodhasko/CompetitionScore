@@ -28,7 +28,7 @@ const ListAthletes = ({navigation, route}) => {
     setAthletes(arrayAthletes);
   };
 
-  const navigateToInputScore = ({id, title, score}) => {
+  const navigateToInputScore = ({id, title, score, decline}) => {
     navigation.navigate('InputScore', {
       spreadSheetId: spreadSheetId,
       id,
@@ -36,6 +36,7 @@ const ListAthletes = ({navigation, route}) => {
       category: category,
       nomination: sheetName,
       score,
+      decline,
       athletes: athletes,
       getAthletes,
     });
@@ -58,6 +59,7 @@ const ListAthletes = ({navigation, route}) => {
                 id={item.item.id}
                 title={item.item.name}
                 score={item.item.score}
+                decline={item.item.decline}
                 onPress={navigateToInputScore}
               />
             )}
