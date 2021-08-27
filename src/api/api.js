@@ -57,7 +57,7 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
   const accessToken = await getFreshToken();
   const email = await AsyncStorage.getItem('email');
 
-  const indexColumnScore = range[email].scoreColumn; //Получаем индекс столбца с оценкой по email
+  const indexColumnScore = range[email].indexScoreColumn; //Получаем индекс столбца с оценкой по email
   const accessToDecline = range[email]?.decline; //Смотрим есть ли у данного email разрешение на получение сбавки
 
   let rages = `${sheetName}!A24:Q50`;
@@ -78,6 +78,7 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
   const arrayValues = response.valueRanges[0].values;
 
   const arrayWithoutEmpty = arrayValues.filter(item => item[1]);
+  console.log(arrayWithoutEmpty);
 
   const athletes = arrayWithoutEmpty.map((item, index) => {
     return {
@@ -85,7 +86,7 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
       id: index,
       name: item[1],
       score: item[indexColumnScore],
-      decline: accessToDecline ? item[13] : null,
+      decline: accessToDecline ? item[16] : null,
     };
   });
 
@@ -104,8 +105,10 @@ export const setValueIntoCell = async (
   valueDecline,
 ) => {
   const accessToken = await getFreshToken();
+  const email = await AsyncStorage.getItem('email');
 
   const row = Number(indexAthlete) + 24;
+  const symbolColumnScore = range[email].symbolScoreColumn;
 
   await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchUpdate`,
@@ -119,11 +122,11 @@ export const setValueIntoCell = async (
       body: JSON.stringify({
         data: [
           {
-            range: `D${row}`,
+            range: `${symbolColumnScore}${row}`,
             values: [[valueScore]],
           },
           {
-            range: `N${row}`,
+            range: `Q${row}`,
             values: [[valueDecline]],
           },
         ],

@@ -52,7 +52,7 @@ const InputScore = ({navigation, route}) => {
     if (score) {
       setCurrentValue(score);
       setNewScore(score);
-      decline && setNewDecline(decline);
+      decline ? setNewDecline(decline) : setNewDecline('');
 
       setDisabledButtons(true);
       setDisableSendButton(true);
@@ -137,6 +137,10 @@ const InputScore = ({navigation, route}) => {
         setDisableSendButton(true);
         setDisableNextButton(false);
         setDisablePrevButton(false);
+        if (lengthDecline !== 0) {
+          setDisableNextButton(true);
+          setDisablePrevButton(true);
+        }
       } else if (lengthScore === 1 || lengthDecline === 1) {
         setDisableSendButton(true);
         setDisableNextButton(true);
