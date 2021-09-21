@@ -64,6 +64,10 @@ const InputScore = ({navigation, route}) => {
       setNewScore('');
       setNewDecline('');
 
+      setTypeInput('score');
+      setActiveScoreInput(true);
+      setActiveDeclineInput(false);
+
       setDisabledButtons(false);
       setDisableInput(false);
       setInputBorderGreen(false);
