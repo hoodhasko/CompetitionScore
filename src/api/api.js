@@ -46,6 +46,7 @@ export const getSheetsFromSpreadSheet = async spreadSheetid => {
   const sheets = response.sheets;
   // console.log(response.sheets[0].properties.sheetId);
 
+  // console.log(sheets);
   return sheets;
 };
 
@@ -56,14 +57,17 @@ export const getSheetsFromSpreadSheet = async spreadSheetid => {
 export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
   const accessToken = await getFreshToken();
   const email = await AsyncStorage.getItem('email');
+  console.log(sheetName);
 
   const indexColumnScore = range[email].indexScoreColumn; //Получаем индекс столбца с оценкой по email
   const accessToDecline = range[email]?.decline; //Смотрим есть ли у данного email разрешение на получение сбавки
 
   let rages = `${sheetName}!A24:Q50`;
+  let ragesEncode = encodeURIComponent(rages); //Кодируем название листа, в избежании ошибок когда название будет например содержит символ +
+  console.log(ragesEncode);
 
   const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?ranges=${rages}`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?ranges=${ragesEncode}`,
     {
       method: 'GET',
       headers: {
@@ -74,11 +78,12 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
   )
     .then(res => res.json())
     .then(data => data);
+  console.log(response);
 
   const arrayValues = response.valueRanges[0].values;
 
   const arrayWithoutEmpty = arrayValues.filter(item => item[1]);
-  console.log(arrayWithoutEmpty);
+  // console.log(arrayWithoutEmpty);
 
   const athletes = arrayWithoutEmpty.map((item, index) => {
     return {
@@ -89,6 +94,7 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
       decline: accessToDecline ? item[16] : null,
     };
   });
+  // console.log(athletes);
 
   return athletes;
 };
