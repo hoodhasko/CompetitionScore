@@ -10,6 +10,7 @@ import {
 
 import {setValueIntoCell} from '../api/api.js';
 import Header from '../components/Header.js';
+import SubTitle from '../components/SubTitle.js';
 import Loader from '../components/Loader';
 import ButtonsScoreGroup from '../components/ButtonsScoreGroup.js';
 import ButtonToggleAthlete from '../components/ButtonToggleAthlete.js';
@@ -18,8 +19,6 @@ const InputScore = ({navigation, route}) => {
   const [newScore, setNewScore] = useState('');
   const [newDecline, setNewDecline] = useState('');
   const [currentValue, setCurrentValue] = useState('');
-  const [name, setName] = useState('');
-  const [idAthlete, setIdAthlete] = useState('');
   const [typeInput, setTypeInput] = useState('score');
 
   const [disabledButtons, setDisabledButtons] = useState(false);
@@ -31,28 +30,19 @@ const InputScore = ({navigation, route}) => {
   const [activeDeclineInput, setActiveDeclineInput] = useState(false);
   const [inputBorderGreen, setInputBorderGreen] = useState(false);
 
-  const [showDeclineInput, setShowDeclineInput] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const {
-    spreadSheetId,
-    id,
-    score,
-    decline,
-    athleteName,
-    category,
-    nomination,
-    athletes,
-    getAthletes,
-  } = route.params;
+  const {spreadSheetId, category, nomination, athlete, athletes, getAthletes} =
+    route.params;
+
+  const {id: idAthlete, name, score, decline, showDecline} = athlete;
 
   useEffect(() => {
-    setName(athleteName);
-    setIdAthlete(id);
     if (score) {
       setCurrentValue(score);
       setNewScore(score);
       decline ? setNewDecline(decline) : setNewDecline('');
+      // setNewDecline(decline);
 
       setDisabledButtons(true);
       setDisableSendButton(true);
@@ -72,40 +62,26 @@ const InputScore = ({navigation, route}) => {
       setDisableInput(false);
       setInputBorderGreen(false);
     }
-    if (decline === null) {
-      setShowDeclineInput(false);
-    }
-  }, [score, decline, athleteName, id]);
-
-  const toggleDisableNextPrevButtons = (idA, arrayA) => {
-    if (idA === 0) {
-      setDisablePrevButton(true);
-    } else {
-      setDisablePrevButton(false);
-    }
-
-    if (idA === arrayA.length - 1) {
-      setDisableNextButton(true);
-    } else {
-      setDisableNextButton(false);
-    }
-  };
-
-  useEffect(() => {
-    toggleDisableNextPrevButtons(idAthlete, athletes);
-  }, [idAthlete, athletes]);
+  }, [score, decline, name]);
 
   const sendScore = async (valueScore, valueDecline) => {
     setLoading(true);
+    setTypeInput('');
 
     if (valueDecline.length === 0) {
       valueDecline = null;
     }
 
-    await setValueIntoCell(spreadSheetId, idAthlete, valueScore, valueDecline);
-    const athlete = athletes.filter(ath => ath.id === idAthlete)[0];
-    athlete.score = valueScore;
-    athlete.decline = valueDecline;
+    await setValueIntoCell(
+      spreadSheetId,
+      nomination,
+      idAthlete,
+      valueScore,
+      valueDecline,
+    );
+    const athleteFiltered = athletes.filter(ath => ath.id === idAthlete)[0];
+    athleteFiltered.score = valueScore;
+    athleteFiltered.decline = valueDecline;
 
     getAthletes();
 
@@ -118,15 +94,14 @@ const InputScore = ({navigation, route}) => {
   };
 
   const toggleAthlete = idToggleAthlete => {
-    const athlete = athletes.filter(ath => ath.id === idToggleAthlete)[0];
+    const athleteFiltered = athletes.filter(
+      ath => ath.id === idToggleAthlete,
+    )[0];
 
     if (athlete) {
       navigation.navigate('InputScore', {
         spreadSheetId: spreadSheetId,
-        id: athlete.id,
-        athleteName: athlete.name,
-        score: athlete.score,
-        decline: athlete.decline,
+        athlete: athleteFiltered,
         athletes: athletes,
         getAthletes,
       });
@@ -161,6 +136,24 @@ const InputScore = ({navigation, route}) => {
     }
   }, [newScore, newDecline, score]);
 
+  useEffect(() => {
+    toggleDisableNextPrevButtons(idAthlete, athletes);
+  }, [idAthlete, athletes, newScore]);
+
+  const toggleDisableNextPrevButtons = (idA, arrayA) => {
+    if (idA === 0) {
+      setDisablePrevButton(true);
+    } else {
+      setDisablePrevButton(false);
+    }
+
+    if (idA === arrayA.length - 1) {
+      setDisableNextButton(true);
+    } else {
+      setDisableNextButton(false);
+    }
+  };
+
   const PressOnInput = (value, type) => {
     if (currentValue.length === 1 || currentValue.length === 2) {
       return;
@@ -171,7 +164,8 @@ const InputScore = ({navigation, route}) => {
       setActiveScoreInput(true);
 
       setCurrentValue(value);
-    } else {
+    }
+    if (type === 'decline') {
       setActiveScoreInput(false);
       setActiveDeclineInput(true);
 
@@ -182,7 +176,8 @@ const InputScore = ({navigation, route}) => {
   useEffect(() => {
     if (typeInput === 'score') {
       setNewScore(currentValue);
-    } else {
+    }
+    if (typeInput === 'decline') {
       setNewDecline(currentValue);
     }
   }, [currentValue, typeInput]);
@@ -195,9 +190,7 @@ const InputScore = ({navigation, route}) => {
         <>
           <View style={styles.header}>
             <Header title={name} buttonBack />
-            <Text style={styles.subTitle}>
-              Категория: {category} Номинация: {nomination}
-            </Text>
+            <SubTitle category={category} nomination={nomination} />
           </View>
           <View style={styles.score}>
             <View style={styles.inputScore}>
@@ -220,7 +213,7 @@ const InputScore = ({navigation, route}) => {
                 showSoftInputOnFocus={false}
               />
             </View>
-            {showDeclineInput && (
+            {showDecline && (
               <View style={styles.inputScore}>
                 <Text style={styles.labelInput}>СБАВКА</Text>
                 <TextInput
@@ -304,10 +297,6 @@ const styles = StyleSheet.create({
   },
   header: {
     alignSelf: 'flex-start',
-  },
-  subTitle: {
-    fontSize: 20,
-    marginBottom: 4,
   },
   score: {
     alignItems: 'flex-end',

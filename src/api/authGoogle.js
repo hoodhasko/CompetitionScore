@@ -3,6 +3,7 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {client_id, client_secret} from '../config/secret';
 
 GoogleSignin.configure({
   scopes: [
@@ -14,8 +15,7 @@ GoogleSignin.configure({
   ],
   // androidClientId:
   //   '1079638034579-8fgmrcqn45htferj80np6fjtvd28796q.apps.googleusercontent.com',
-  webClientId:
-    '1079638034579-smfpe6jjmvcslg5lisi9dtoaaci3ev51.apps.googleusercontent.com',
+  webClientId: client_id,
   offlineAccess: true,
   forceCodeForRefreshToken: true,
 });
@@ -68,26 +68,23 @@ const getRefreshToken = async () => {
       body: JSON.stringify({
         grant_type: 'authorization_code',
         code: serverAuthCode,
-        client_id:
-          '1079638034579-smfpe6jjmvcslg5lisi9dtoaaci3ev51.apps.googleusercontent.com',
-        client_secret: 'yAzCOhLo72P856chOSgaA-nb',
+        client_id: client_id,
+        client_secret: client_secret,
       }),
     },
   )
     .then(data => data.json())
     .then(res => res.refresh_token);
 
-  console.log(refreshToken);
-
   await AsyncStorage.setItem('refresh_token', refreshToken);
+  return refreshToken;
 };
 
 const getAccessToken = async () => {
   let refreshToken = await AsyncStorage.getItem('refresh_token');
 
   if (!refreshToken) {
-    await getRefreshToken();
-    refreshToken = await AsyncStorage.getItem('refresh_token');
+    refreshToken = await getRefreshToken();
   }
 
   const res = await fetch('https://www.googleapis.com/oauth2/v4/token', {
@@ -98,9 +95,8 @@ const getAccessToken = async () => {
     body: JSON.stringify({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
-      client_id:
-        '1079638034579-smfpe6jjmvcslg5lisi9dtoaaci3ev51.apps.googleusercontent.com',
-      client_secret: 'yAzCOhLo72P856chOSgaA-nb',
+      client_id: client_id,
+      client_secret: client_secret,
     }),
   }).then(data => data.json());
 

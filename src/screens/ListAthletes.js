@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import {SafeAreaView, View, FlatList, Text, StyleSheet} from 'react-native';
+import {SafeAreaView, View, FlatList, StyleSheet} from 'react-native';
 
 import {getAthletesFromSheet} from '../api/api';
 
 import Header from '../components/Header';
+import SubTitle from '../components/SubTitle';
 import Loader from '../components/Loader';
 import ListItem from '../components/ListItem';
 import ButtonRefresh from '../components/ButtonRefresh';
@@ -28,15 +29,12 @@ const ListAthletes = ({navigation, route}) => {
     setAthletes(arrayAthletes);
   };
 
-  const navigateToInputScore = ({id, title, score, decline}) => {
+  const navigateToInputScore = ({athlete}) => {
     navigation.navigate('InputScore', {
       spreadSheetId: spreadSheetId,
-      id,
-      athleteName: title,
       category: category,
       nomination: sheetName,
-      score,
-      decline,
+      athlete,
       athletes: athletes,
       getAthletes,
     });
@@ -49,17 +47,14 @@ const ListAthletes = ({navigation, route}) => {
       ) : (
         <View style={styles.listItems}>
           <Header title="Спортсмены" buttonBack />
-          <Text style={styles.subTitle}>
-            Категория: {category} Номинация: {sheetName}
-          </Text>
+          <SubTitle category={category} nomination={sheetName} />
           <FlatList
             data={athletes}
             renderItem={item => (
               <ListItem
                 id={item.item.id}
                 title={item.item.name}
-                score={item.item.score}
-                decline={item.item.decline}
+                athlete={item.item}
                 onPress={navigateToInputScore}
               />
             )}
@@ -84,10 +79,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: '100%',
     height: '100%',
-  },
-  subTitle: {
-    fontSize: 20,
-    marginBottom: 4,
   },
 });
 

@@ -57,14 +57,12 @@ export const getSheetsFromSpreadSheet = async spreadSheetid => {
 export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
   const accessToken = await getFreshToken();
   const email = await AsyncStorage.getItem('email');
-  console.log(sheetName);
 
   const indexColumnScore = range[email].indexScoreColumn; //Получаем индекс столбца с оценкой по email
   const accessToDecline = range[email]?.decline; //Смотрим есть ли у данного email разрешение на получение сбавки
 
-  let rages = `${sheetName}!A24:Q50`;
+  let rages = `${sheetName}!A24:Q124`;
   let ragesEncode = encodeURIComponent(rages); //Кодируем название листа, в избежании ошибок когда название будет например содержит символ +
-  console.log(ragesEncode);
 
   const response = await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?ranges=${ragesEncode}`,
@@ -78,7 +76,6 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
   )
     .then(res => res.json())
     .then(data => data);
-  console.log(response);
 
   const arrayValues = response.valueRanges[0].values;
 
@@ -91,10 +88,10 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
       id: index,
       name: item[1],
       score: item[indexColumnScore],
-      decline: accessToDecline ? item[16] : null,
+      decline: item[16],
+      showDecline: accessToDecline,
     };
   });
-  // console.log(athletes);
 
   return athletes;
 };
@@ -106,6 +103,7 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
 */
 export const setValueIntoCell = async (
   spreadSheetId,
+  sheetName,
   indexAthlete,
   valueScore,
   valueDecline,
@@ -128,11 +126,11 @@ export const setValueIntoCell = async (
       body: JSON.stringify({
         data: [
           {
-            range: `${symbolColumnScore}${row}`,
+            range: `${sheetName}!${symbolColumnScore}${row}`,
             values: [[valueScore]],
           },
           {
-            range: `Q${row}`,
+            range: `${sheetName}!Q${row}`,
             values: [[valueDecline]],
           },
         ],

@@ -4,6 +4,7 @@ import {SafeAreaView, View, FlatList, Text, StyleSheet} from 'react-native';
 import {getSheetsFromSpreadSheet} from '../api/api';
 
 import Header from '../components/Header';
+import SubTitle from '../components/SubTitle';
 import Loader from '../components/Loader';
 import ListItem from '../components/ListItem';
 import ButtonRefresh from '../components/ButtonRefresh';
@@ -42,7 +43,7 @@ const ListSheets = ({navigation, route}) => {
       ) : (
         <View style={styles.listItems}>
           <Header title="Номинация" buttonBack />
-          <Text style={styles.subTitle}>Категория: {category}</Text>
+          <SubTitle category={category} />
           <FlatList
             data={sheets}
             renderItem={item => (
@@ -74,10 +75,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: '100%',
     height: '100%',
-  },
-  subTitle: {
-    fontSize: 20,
-    marginBottom: 4,
   },
 });
 

@@ -57,3 +57,6 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+
+# Ключи доступа к приложению
+src/config/secret.js
