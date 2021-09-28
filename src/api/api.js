@@ -79,18 +79,22 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
 
   const arrayValues = response.valueRanges[0].values;
 
-  const arrayWithoutEmpty = arrayValues.filter(item => item[1]);
-  // console.log(arrayWithoutEmpty);
+  const athletes = [];
+  let indexAthlete = 0;
 
-  const athletes = arrayWithoutEmpty.map((item, index) => {
-    return {
-      ...athletes,
-      id: index,
-      name: item[1],
-      score: item[indexColumnScore],
-      decline: item[16],
-      showDecline: accessToDecline,
-    };
+  arrayValues.map((item, index) => {
+    if (item[1]) {
+      let athlete = {
+        id: index,
+        indexAthlete: indexAthlete,
+        name: item[1],
+        score: item[indexColumnScore],
+        decline: item[16],
+        showDecline: accessToDecline,
+      };
+      athletes.push(athlete);
+      indexAthlete += 1;
+    }
   });
 
   return athletes;

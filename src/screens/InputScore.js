@@ -35,7 +35,14 @@ const InputScore = ({navigation, route}) => {
   const {spreadSheetId, category, nomination, athlete, athletes, getAthletes} =
     route.params;
 
-  const {id: idAthlete, name, score, decline, showDecline} = athlete;
+  const {
+    id: idAthlete,
+    indexAthlete,
+    name,
+    score,
+    decline,
+    showDecline,
+  } = athlete;
 
   useEffect(() => {
     if (score) {
@@ -93,12 +100,12 @@ const InputScore = ({navigation, route}) => {
     toggleDisableNextPrevButtons(idAthlete, athletes);
   };
 
-  const toggleAthlete = idToggleAthlete => {
+  const toggleAthlete = indexToggleAthlete => {
     const athleteFiltered = athletes.filter(
-      ath => ath.id === idToggleAthlete,
+      ath => ath.indexAthlete === indexToggleAthlete,
     )[0];
 
-    if (athlete) {
+    if (athleteFiltered) {
       navigation.navigate('InputScore', {
         spreadSheetId: spreadSheetId,
         athlete: athleteFiltered,
@@ -137,8 +144,8 @@ const InputScore = ({navigation, route}) => {
   }, [newScore, newDecline, score]);
 
   useEffect(() => {
-    toggleDisableNextPrevButtons(idAthlete, athletes);
-  }, [idAthlete, athletes, newScore]);
+    toggleDisableNextPrevButtons(indexAthlete, athletes);
+  }, [indexAthlete, athletes, newScore]);
 
   const toggleDisableNextPrevButtons = (idA, arrayA) => {
     if (idA === 0) {
@@ -246,7 +253,7 @@ const InputScore = ({navigation, route}) => {
             <ButtonToggleAthlete
               text={'ПРЕД'}
               disabled={disablePrevButton}
-              onPress={() => toggleAthlete(idAthlete - 1)}
+              onPress={() => toggleAthlete(indexAthlete - 1)}
             />
             <TouchableOpacity
               style={
@@ -261,7 +268,7 @@ const InputScore = ({navigation, route}) => {
             <ButtonToggleAthlete
               text={'СЛЕД'}
               disabled={disableNextButton}
-              onPress={() => toggleAthlete(idAthlete + 1)}
+              onPress={() => toggleAthlete(indexAthlete + 1)}
             />
           </View>
         </>
@@ -294,6 +301,8 @@ const styles = StyleSheet.create({
   root: {
     alignItems: 'center',
     paddingHorizontal: 10,
+    backgroundColor: '#E7EBF8',
+    height: '100%',
   },
   header: {
     alignSelf: 'flex-start',

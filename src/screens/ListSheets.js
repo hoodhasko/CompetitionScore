@@ -17,11 +17,12 @@ const ListSheets = ({navigation, route}) => {
   const getSheets = async () => {
     setIsLoading(true);
     const nominations = await getSheetsFromSpreadSheet(spreadSheetId);
-    setSheets(nominations);
 
     if (nominations !== undefined) {
       setIsLoading(false);
     }
+
+    setSheets(nominations);
   };
 
   useEffect(() => {

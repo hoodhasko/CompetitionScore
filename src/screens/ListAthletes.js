@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {SafeAreaView, View, FlatList, StyleSheet} from 'react-native';
+import {SafeAreaView, View, FlatList, Text, StyleSheet} from 'react-native';
 
 import {getAthletesFromSheet} from '../api/api';
 
@@ -12,6 +12,7 @@ import ButtonRefresh from '../components/ButtonRefresh';
 const ListAthletes = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [athletes, setAthletes] = useState();
+  const [showEmpty, setShowEmpty] = useState(false);
   const {spreadSheetId, category, sheetName} = route.params;
 
   useEffect(() => {
@@ -24,6 +25,12 @@ const ListAthletes = ({navigation, route}) => {
 
     if (arrayAthletes !== undefined) {
       setIsLoading(false);
+    }
+
+    if (arrayAthletes.length === 0) {
+      setShowEmpty(true);
+    } else {
+      setShowEmpty(false);
     }
 
     setAthletes(arrayAthletes);
@@ -48,20 +55,26 @@ const ListAthletes = ({navigation, route}) => {
         <View style={styles.listItems}>
           <Header title="Спортсмены" buttonBack />
           <SubTitle category={category} nomination={sheetName} />
-          <FlatList
-            data={athletes}
-            renderItem={item => (
-              <ListItem
-                id={item.item.id}
-                title={item.item.name}
-                athlete={item.item}
-                onPress={navigateToInputScore}
-              />
-            )}
-            keyExtractor={item => item.id}
-            refreshing={isLoading}
-            showsVerticalScrollIndicator={false}
-          />
+          {showEmpty ? (
+            <Text style={styles.emptyText}>
+              Нет спортсменов для выставления оценки
+            </Text>
+          ) : (
+            <FlatList
+              data={athletes}
+              renderItem={item => (
+                <ListItem
+                  id={item.item.id}
+                  title={item.item.name}
+                  athlete={item.item}
+                  onPress={navigateToInputScore}
+                />
+              )}
+              keyExtractor={item => item.id}
+              refreshing={isLoading}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
           <ButtonRefresh refreshFunction={getAthletes} />
         </View>
       )}
@@ -79,6 +92,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: '100%',
     height: '100%',
+  },
+  emptyText: {
+    fontSize: 28,
+    marginTop: '60%',
+    alignSelf: 'center',
   },
 });
 
