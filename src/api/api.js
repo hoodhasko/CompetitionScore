@@ -90,7 +90,7 @@ export const getAthletesFromSheet = async (spreadSheetId, sheetName) => {
         name: item[1],
         score: item[indexColumnScore],
         decline: item[16],
-        showDecline: accessToDecline,
+        accessDecline: accessToDecline,
       };
       athletes.push(athlete);
       indexAthlete += 1;

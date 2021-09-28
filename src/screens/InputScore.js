@@ -41,15 +41,17 @@ const InputScore = ({navigation, route}) => {
     name,
     score,
     decline,
-    showDecline,
+    accessDecline,
   } = athlete;
 
   useEffect(() => {
+    if (accessDecline) {
+      decline ? setNewDecline(decline) : setNewDecline('');
+    }
+
     if (score) {
       setCurrentValue(score);
       setNewScore(score);
-      decline ? setNewDecline(decline) : setNewDecline('');
-      // setNewDecline(decline);
 
       setDisabledButtons(true);
       setDisableSendButton(true);
@@ -59,7 +61,6 @@ const InputScore = ({navigation, route}) => {
     } else {
       setCurrentValue('');
       setNewScore('');
-      setNewDecline('');
 
       setTypeInput('score');
       setActiveScoreInput(true);
@@ -69,13 +70,13 @@ const InputScore = ({navigation, route}) => {
       setDisableInput(false);
       setInputBorderGreen(false);
     }
-  }, [score, decline, name]);
+  }, [score, decline, accessDecline]);
 
   const sendScore = async (valueScore, valueDecline) => {
     setLoading(true);
     setTypeInput('');
 
-    if (valueDecline.length === 0) {
+    if (!accessDecline) {
       valueDecline = null;
     }
 
@@ -97,7 +98,7 @@ const InputScore = ({navigation, route}) => {
     setDisabledButtons(true);
     setDisableInput(true);
     setInputBorderGreen(true);
-    toggleDisableNextPrevButtons(idAthlete, athletes);
+    toggleDisableNextPrevButtons(indexAthlete, athletes);
   };
 
   const toggleAthlete = indexToggleAthlete => {
@@ -121,8 +122,7 @@ const InputScore = ({navigation, route}) => {
     if (!score) {
       if (lengthScore === 0) {
         setDisableSendButton(true);
-        setDisableNextButton(false);
-        setDisablePrevButton(false);
+        toggleDisableNextPrevButtons(indexAthlete, athletes);
         if (lengthDecline !== 0) {
           setDisableNextButton(true);
           setDisablePrevButton(true);
@@ -140,21 +140,19 @@ const InputScore = ({navigation, route}) => {
         setDisableNextButton(true);
         setDisablePrevButton(true);
       }
+    } else {
+      toggleDisableNextPrevButtons(indexAthlete, athletes);
     }
-  }, [newScore, newDecline, score]);
+  }, [newScore, newDecline, score, indexAthlete, athletes]);
 
-  useEffect(() => {
-    toggleDisableNextPrevButtons(indexAthlete, athletes);
-  }, [indexAthlete, athletes, newScore]);
-
-  const toggleDisableNextPrevButtons = (idA, arrayA) => {
-    if (idA === 0) {
+  const toggleDisableNextPrevButtons = (idxA, arrayA) => {
+    if (idxA === 0) {
       setDisablePrevButton(true);
     } else {
       setDisablePrevButton(false);
     }
 
-    if (idA === arrayA.length - 1) {
+    if (idxA === arrayA.length - 1) {
       setDisableNextButton(true);
     } else {
       setDisableNextButton(false);
@@ -220,7 +218,7 @@ const InputScore = ({navigation, route}) => {
                 showSoftInputOnFocus={false}
               />
             </View>
-            {showDecline && (
+            {accessDecline && (
               <View style={styles.inputScore}>
                 <Text style={styles.labelInput}>СБАВКА</Text>
                 <TextInput
