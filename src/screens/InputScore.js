@@ -98,7 +98,6 @@ const InputScore = ({navigation, route}) => {
     setDisabledButtons(true);
     setDisableInput(true);
     setInputBorderGreen(true);
-    toggleDisableNextPrevButtons(indexAthlete, athletes);
   };
 
   const toggleAthlete = indexToggleAthlete => {
